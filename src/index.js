@@ -1,5 +1,6 @@
 const Koa = require("koa");
 const Router = require("koa-router");
+const api = require("./api");
 
 // #. Koa 애플리케이션은 미들웨어((ctx, next) => {})의 배열로 구성되어 있음. app.use()를 사용해 등록된 순서대로 미들웨어 실행.
 const app = new Koa();
@@ -58,6 +59,9 @@ router.get("/posts", (ctx) => {
   const { id } = ctx.query;
   ctx.body = id ? `포스트 #${id}` : "포스트 아이디가 없습니다.";
 });
+
+// #. 기존 라우터에 '/api' 경로 적용
+router.use("/api", api.routes());
 
 app.use(router.routes()).use(router.allowedMethods());
 
