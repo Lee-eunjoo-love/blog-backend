@@ -5,7 +5,7 @@ const printInfo = (ctx) => {
   ctx.body = {
     method: ctx.method,
     path: ctx.path,
-    params: ctx.parmas,
+    params: ctx.params,
   };
 };
 
