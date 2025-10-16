@@ -6,6 +6,7 @@
   "dependencies": {
     "eslint-config-prettier": "^10.1.8",
     "koa": "^3.0.1",
+    "koa-bodyparser": "^4.4.1",
     "koa-router": "^14.0.0"
   },
   "devDependencies": {
