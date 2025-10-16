@@ -20,20 +20,18 @@ const posts = [
 
 /**
  * POST /api/posts
- * @param { title, body} ctx
  */
 exports.write = (ctx) => {
   // #. REST API 의 Request Body는 ctx.request.body 에서 조회 가능
   const { title, body } = ctx.request.body;
   postId += 1;
   const post = { id: postId, title, body };
-  posts.put(post);
+  posts.push(post);
   ctx.body = post;
 };
 
 /**
  * GET /api/posts
- * @param {*} ctx
  */
 exports.list = (ctx) => {
   ctx.body = posts;
@@ -87,6 +85,7 @@ exports.replace = (ctx) => {
     };
     return;
   }
+  // #. PUT: id 를 제외한 모든 값을 대체. 일부 필드만 변경시 request.body 에 없는 항목은 삭제되므로 모든 필드가 있는지 검증 필요.
   posts[index] = {
     id,
     ...ctx.request.body,
@@ -96,7 +95,6 @@ exports.replace = (ctx) => {
 
 /**
  * PATCH /api/posts/:id
- * @param { title, body} ctx
  */
 exports.update = (ctx) => {
   const { id } = ctx.params;
@@ -108,6 +106,7 @@ exports.update = (ctx) => {
     };
     return;
   }
+  // #. PATCH : 기존 값을 유지하면서 변경된 값만 업데이트
   posts[index] = {
     ...posts[index],
     ...ctx.request.body,
