@@ -1,5 +1,6 @@
 const Koa = require("koa");
 const Router = require("koa-router");
+const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
 const api = require("./api");
 
 // #. Koa 애플리케이션은 미들웨어((ctx, next) => {})의 배열로 구성되어 있음. app.use()를 사용해 등록된 순서대로 미들웨어 실행.
@@ -23,10 +24,10 @@ const router = new Router();
 app.use(async (ctx, next) => {
   console.log(ctx.url);
   console.log(1);
-  if (ctx.query.authorized !== "1") {
+  /*if (ctx.query.authorized !== "1") {
     ctx.status = 401; // Unauthorized
     return;
-  }
+  }*/
   await next();
   // #. next() 가 반환한 Promise 는 다음에 처리할 미들웨어가 끝난후 완료됨.
   console.log("END");
@@ -63,6 +64,10 @@ router.get("/posts", (ctx) => {
 // #. 기존 라우터에 '/api' 경로 적용
 router.use("/api", api.routes());
 
+// #. bodyParser 는 라우터 적용 전에 등록
+app.use(bodyParser());
+
+// #. app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(4000, () => {
