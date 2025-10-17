@@ -1,6 +1,21 @@
+require("dotenv").config();
 const Koa = require("koa");
 const Router = require("koa-router");
 const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
+const mongoose = require("mongoose");
+
+// [MongoDB]
+const { PORT, MONGO_URI } = process.env;
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((e) => {
+    console.log(e);
+  });
+
 const api = require("./api");
 
 // #. Koa 애플리케이션은 미들웨어((ctx, next) => {})의 배열로 구성되어 있음. app.use()를 사용해 등록된 순서대로 미들웨어 실행.
@@ -70,6 +85,7 @@ app.use(bodyParser());
 // #. app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
 
-app.listen(4000, () => {
-  console.log("Listening to port 4000");
+const port = PORT || 4000;
+app.listen(port, () => {
+  console.log("Listening to port %d", port);
 });
