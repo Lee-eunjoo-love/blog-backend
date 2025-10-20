@@ -1,8 +1,15 @@
-require("dotenv").config();
-const Koa = require("koa");
-const Router = require("koa-router");
-const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
-const mongoose = require("mongoose");
+//require("dotenv").config();
+//const Koa = require("koa");
+//const Router = require("koa-router");
+//const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
+//const mongoose = require("mongoose");
+
+import "dotenv/config"; //require("dotenv").config();
+import Koa from "koa"; //const Koa = require("koa");
+import Router from "koa-router"; //const Router = require("koa-router");
+import bodyParser from "koa-bodyparser"; //const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
+import mongoose from "mongoose"; //const mongoose = require("mongoose");
+import api from "./api/index.js"; //const api = require("./api");
 
 // [MongoDB]
 const { PORT, MONGO_URI } = process.env;

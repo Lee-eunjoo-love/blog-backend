@@ -35,22 +35,22 @@ const router = new Router();
   });
 });*/
 // #. [Koa async/await 지원] async/await 사용하기
-app.use(async (ctx, next) => {
+/*app.use(async (ctx, next) => {
   console.log(ctx.url);
   console.log(1);
-  /*if (ctx.query.authorized !== "1") {
-    ctx.status = 401; // Unauthorized
-    return;
-  }*/
+  //if (ctx.query.authorized !== "1") {
+  //  ctx.status = 401; // Unauthorized
+  //  return;
+  //}
   await next();
   // #. next() 가 반환한 Promise 는 다음에 처리할 미들웨어가 끝난후 완료됨.
   console.log("END");
-});
+});*/
 
-app.use((ctx, next) => {
+/*app.use((ctx, next) => {
   console.log(2);
   next();
-});
+});*/
 
 /*app.use((ctx) => {
   console.log(3);

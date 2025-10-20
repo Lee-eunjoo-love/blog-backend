@@ -7,8 +7,9 @@
  * const 모듈명 = require('컨트롤러 파일명)
  * 모듈명.함수명();
  */
-
-let postId = 1; // #. 초기값
+import Post from "../../models/post.js";
+import mongoose from "mongoose";
+/*let postId = 1; // #. 초기값
 
 const posts = [
   {
@@ -16,34 +17,67 @@ const posts = [
     title: "제목",
     body: "내용",
   },
-];
+];*/
+const { ObjectId } = mongoose.Types;
+export const checkObjectId = (ctx, next) => {
+  const { id } = ctx.params;
+  if (!ObjectId.isValid(id)) {
+    ctx.status = 400; // #. Bad Request
+    return;
+  }
+
+  return next();
+};
 
 /**
  * POST /api/posts
  */
 //exports.write = (ctx) => {
-export const write = (ctx) => {
+/*export const write = (ctx) => {
   // #. REST API 의 Request Body는 ctx.request.body 에서 조회 가능
   const { title, body } = ctx.request.body;
   postId += 1;
   const post = { id: postId, title, body };
   posts.push(post);
   ctx.body = post;
+};*/
+export const write = async (ctx) => {
+  const { title, body } = ctx.request.body;
+  const post = new Post({
+    title,
+    body,
+    tags,
+  });
+
+  try {
+    await post.save();
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, 0);
+  }
 };
 
 /**
  * GET /api/posts
  */
 //exports.list = (ctx) => {
-export const list = (ctx) => {
+/*export const list = (ctx) => {
   ctx.body = posts;
+};*/
+export const list = async (ctx) => {
+  try {
+    const posts = await Post.find().exec();
+    ctx.body = posts;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 /**
  * GET /api/posts/:id
  */
 //exports.read = (ctx) => {
-export const read = (ctx) => {
+/*export const read = (ctx) => {
   const { id } = ctx.params;
   // #. 파라미터로 받아 온 값은 문자열이므로 동일한 데이터형으로 변환 필요
   const post = posts.find((p) => p.id.toString() === id);
@@ -55,13 +89,26 @@ export const read = (ctx) => {
     return;
   }
   ctx.body = post;
+};*/
+export const read = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    const post = await Post.findById(id).exec();
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 /**
  * DELETE /api/posts/:id
  */
 //exports.remove = (ctx) => {
-export const remove = (ctx) => {
+/*export const remove = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
   if (index === -1) {
@@ -73,6 +120,15 @@ export const remove = (ctx) => {
   }
   posts.splice(index, 1);
   ctx.status = 204; // #. No Content
+};*/
+export const remove = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    const index = await Post.findByIdAndDelete(id).exec();
+    ctx.status = 204;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 /**
@@ -80,7 +136,7 @@ export const remove = (ctx) => {
  * @param { title, body} ctx
  */
 //exports.replace = (ctx) => {
-export const replace = (ctx) => {
+/*export const replace = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
   if (index === -1) {
@@ -96,15 +152,16 @@ export const replace = (ctx) => {
     ...ctx.request.body,
   };
   ctx.body = posts[index];
-};
+};*/
 
 /**
  * PATCH /api/posts/:id
  */
 //exports.update = (ctx) => {
-export const update = (ctx) => {
+/*export const update = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
+  console.log(id, index);
   if (index === -1) {
     ctx.status = 404;
     ctx.body = {
@@ -118,6 +175,19 @@ export const update = (ctx) => {
     ...ctx.request.body,
   };
   ctx.body = posts[index];
+};*/
+export const update = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
+      new: true,
+    }).exec();
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
-
-export default posts.ctrl;
