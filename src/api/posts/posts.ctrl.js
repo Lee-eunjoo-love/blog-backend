@@ -21,7 +21,8 @@ const posts = [
 /**
  * POST /api/posts
  */
-exports.write = (ctx) => {
+//exports.write = (ctx) => {
+export const write = (ctx) => {
   // #. REST API 의 Request Body는 ctx.request.body 에서 조회 가능
   const { title, body } = ctx.request.body;
   postId += 1;
@@ -33,14 +34,16 @@ exports.write = (ctx) => {
 /**
  * GET /api/posts
  */
-exports.list = (ctx) => {
+//exports.list = (ctx) => {
+export const list = (ctx) => {
   ctx.body = posts;
 };
 
 /**
  * GET /api/posts/:id
  */
-exports.read = (ctx) => {
+//exports.read = (ctx) => {
+export const read = (ctx) => {
   const { id } = ctx.params;
   // #. 파라미터로 받아 온 값은 문자열이므로 동일한 데이터형으로 변환 필요
   const post = posts.find((p) => p.id.toString() === id);
@@ -57,7 +60,8 @@ exports.read = (ctx) => {
 /**
  * DELETE /api/posts/:id
  */
-exports.remove = (ctx) => {
+//exports.remove = (ctx) => {
+export const remove = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
   if (index === -1) {
@@ -75,7 +79,8 @@ exports.remove = (ctx) => {
  * PUT /api/posts/:id
  * @param { title, body} ctx
  */
-exports.replace = (ctx) => {
+//exports.replace = (ctx) => {
+export const replace = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
   if (index === -1) {
@@ -96,7 +101,8 @@ exports.replace = (ctx) => {
 /**
  * PATCH /api/posts/:id
  */
-exports.update = (ctx) => {
+//exports.update = (ctx) => {
+export const update = (ctx) => {
   const { id } = ctx.params;
   const index = posts.findIndex((p) => p.id.toString() === id);
   if (index === -1) {
@@ -113,3 +119,5 @@ exports.update = (ctx) => {
   };
   ctx.body = posts[index];
 };
+
+export default posts.ctrl;

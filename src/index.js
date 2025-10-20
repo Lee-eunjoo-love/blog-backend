@@ -1,8 +1,9 @@
-require("dotenv").config();
-const Koa = require("koa");
-const Router = require("koa-router");
-const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
-const mongoose = require("mongoose");
+import "dotenv/config"; //require("dotenv").config();
+import Koa from "koa"; //const Koa = require("koa");
+import Router from "koa-router"; //const Router = require("koa-router");
+import bodyParser from "koa-bodyparser"; //const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
+import mongoose from "mongoose"; //const mongoose = require("mongoose");
+import api from "./api/index.js"; //const api = require("./api");
 
 // [MongoDB]
 const { PORT, MONGO_URI } = process.env;
@@ -15,8 +16,6 @@ mongoose
   .catch((e) => {
     console.log(e);
   });
-
-const api = require("./api");
 
 // #. Koa 애플리케이션은 미들웨어((ctx, next) => {})의 배열로 구성되어 있음. app.use()를 사용해 등록된 순서대로 미들웨어 실행.
 const app = new Koa();
@@ -89,3 +88,14 @@ const port = PORT || 4000;
 app.listen(port, () => {
   console.log("Listening to port %d", port);
 });
+
+/**
+ * ESM
+ * Node.Js 13.2 부터 공식 지원하므로 main.js 별도 파일로 분리한후 index.js 에서 불러오는 방식으로 사용하지 않아도 된다.
+ * 브라우저와 백엔드에서 동일하게 작동하는 자바스크립트 공식 모듈 시스템.
+ *
+ * [사용방법]
+ * 1. package.json 에 "type": "module" 설정을 추가하거나 파일확장자를 .mjs 를 사용하면 ESM(ECMAScript Module)로 인식
+ * 2. import 로 다른 모듈 로드
+ * 3. export 로 변수, 함수, 클래스 등 내보내기
+ */
