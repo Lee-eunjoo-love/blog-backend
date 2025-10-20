@@ -9,6 +9,7 @@
  */
 import Post from "../../models/post.js";
 import mongoose from "mongoose";
+import Joi from "joi";
 /*let postId = 1; // #. 초기값
 
 const posts = [
@@ -42,6 +43,19 @@ export const checkObjectId = (ctx, next) => {
   ctx.body = post;
 };*/
 export const write = async (ctx) => {
+  // #. Request Body 검증 (데이터형 및 필수항목 검증)
+  const schema = Joi.object().keys({
+    title: Joi.string().required(),
+    body: Joi.string().required(),
+    tags: Joi.array().items(Joi.string()).required(),
+  });
+  const validRequestBody = schema.validate(ctx.request.body);
+  if (validRequestBody.error) {
+    ctx.status = 400; // #. Bad Request
+    ctx.body = validRequestBody.error;
+    return;
+  }
+
   const { title, body } = ctx.request.body;
   const post = new Post({
     title,
@@ -95,7 +109,7 @@ export const read = async (ctx) => {
   try {
     const post = await Post.findById(id).exec();
     if (!post) {
-      ctx.status = 404;
+      ctx.status = 404; // #. Not Found
       return;
     }
     ctx.body = post;
@@ -125,7 +139,7 @@ export const remove = async (ctx) => {
   const { id } = ctx.params;
   try {
     const index = await Post.findByIdAndDelete(id).exec();
-    ctx.status = 204;
+    ctx.status = 204; // #. No Content
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -177,13 +191,26 @@ export const remove = async (ctx) => {
   ctx.body = posts[index];
 };*/
 export const update = async (ctx) => {
+  // #. Request Body 검증 (대이터형 검증)
+  const schema = Joi.object().keys({
+    title: Joi.string(),
+    body: Joi.string(),
+    tags: Joi.array().items(Joi.string()),
+  });
+  const validRequestBody = schema.validate(ctx.request.body);
+  if (validRequestBody.error) {
+    ctx.status = 400; // #. Bad Request
+    ctx.body = validRequestBody.error;
+    return;
+  }
+
   const { id } = ctx.params;
   try {
     const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
       new: true,
     }).exec();
     if (!post) {
-      ctx.status = 404;
+      ctx.status = 404; // #. Bad Request
       return;
     }
     ctx.body = post;
