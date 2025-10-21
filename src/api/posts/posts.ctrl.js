@@ -79,9 +79,29 @@ export const write = async (ctx) => {
   ctx.body = posts;
 };*/
 export const list = async (ctx) => {
+  const page = parseInt(ctx.query.page || "1", 10);
+
+  if (page < 1) {
+    ctx.status = 400; // #. Bad Request
+    return;
+  }
+
   try {
-    const posts = await Post.find().exec();
-    ctx.body = posts;
+    const posts = await Post.find() //
+      .sort({ _id: -1 }) // #. { key : 정렬순서(1: 순차, -1: 역순) }
+      .limit(10)
+      .skip((page - 1) * 10)
+      .lean() // #. map((post) => post.toJSON()) 대체. 데이터를 처음부터 JSON 형태로 조회.
+      .exec();
+    const postCount = await Post.countDocuments().exec();
+    ctx.set("Last-Page", Math.ceil(postCount / 10));
+    ctx.body = posts //
+      //.map((post) => post.toJSON()) // #. learn() 으로 대체.
+      .map((post) => ({
+        ...post,
+        body:
+          post.body.length < 200 ? post.body : `${post.body.slice(0, 200)}...`,
+      }));
   } catch (e) {
     ctx.throw(500, e);
   }

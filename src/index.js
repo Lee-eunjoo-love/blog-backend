@@ -4,6 +4,7 @@ import Router from "koa-router"; //const Router = require("koa-router");
 import bodyParser from "koa-bodyparser"; //const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
 import mongoose from "mongoose"; //const mongoose = require("mongoose");
 import api from "./api/index.js"; //const api = require("./api");
+import createFakeData from "./createFakeData.js";
 
 // [MongoDB]
 const { PORT, MONGO_URI } = process.env;
@@ -12,6 +13,7 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
+    // #. createFakeData();
   })
   .catch((e) => {
     console.log(e);
