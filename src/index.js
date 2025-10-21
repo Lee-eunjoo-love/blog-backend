@@ -4,7 +4,8 @@ import Router from "koa-router"; //const Router = require("koa-router");
 import bodyParser from "koa-bodyparser"; //const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
 import mongoose from "mongoose"; //const mongoose = require("mongoose");
 import api from "./api/index.js"; //const api = require("./api");
-import createFakeData from "./createFakeData.js";
+import jwtMiddleware from "./lib/jwtMiddleware.js";
+//import createFakeData from "./createFakeData.js";
 
 // [MongoDB]
 const { PORT, MONGO_URI } = process.env;
@@ -82,6 +83,8 @@ router.use("/api", api.routes());
 
 // #. bodyParser 는 라우터 적용 전에 등록
 app.use(bodyParser());
+// #. 토큰 검증 미들웨어는 라우터 적용 전에 등록
+app.use(jwtMiddleware);
 
 // #. app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());

@@ -43,7 +43,14 @@ export const register = async (ctx) => {
     await user.setPassword(password);
     await user.save();
 
-    ctx.body = user.serialize();
+    ctx.body = await user.serialize();
+
+    // #. 토큰 발급
+    const token = await user.generateToken();
+    ctx.cookies.set(process.env.JWT_ACCESS, token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // #. 7일
+      httpOnly: true,
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -70,14 +77,32 @@ export const login = async (ctx) => {
       ctx.status = 401;
       return;
     }
-    ctx.body = user.serialize();
+    ctx.body = await user.serialize();
+
+    // #. 토큰 발급
+    const token = await user.generateToken();
+    ctx.cookies.set(process.env.JWT_ACCESS, token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // #. 7일
+      httpOnly: true,
+    });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
 // #. 로그인 상태 확인
-export const check = async (ctx) => {};
+export const check = async (ctx) => {
+  const { user } = await ctx.state;
+  console.log(JSON.stringify(ctx), ctx.state);
+  if (!user) {
+    ctx.status = 401; // #. Unauthorized
+    return;
+  }
+  ctx.body = user;
+};
 
 // #. 로그아웃 처리
-export const logout = async (ctx) => {};
+export const logout = async (ctx) => {
+  await ctx.cookies.set(process.env.JWT_ACCESS);
+  ctx.status = 204; // #. No Content
+};

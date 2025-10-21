@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // #. 스키마 정의
 const UserSchema = new Schema({
@@ -16,6 +17,7 @@ UserSchema.methods.setPassword = async function (password) {
 // #. 비밀번호 일치여부 검증 인스턴스 메서드 (this 접근을 위해 function 함수 정의)
 UserSchema.methods.checkPassword = async function (password) {
   const result = await bcrypt.compare(password, this.hashedPassword);
+
   return result; // #. true/false
 };
 
@@ -28,7 +30,24 @@ UserSchema.statics.findByUsername = function (username) {
 UserSchema.methods.serialize = function () {
   const data = this.toJSON();
   delete data.hashedPassword;
+
   return data;
+};
+
+// #. JWT 토큰 생성 인스턴스 메서드 (this 접근을 위해 function 함수 정의)
+UserSchema.methods.generateToken = function () {
+  const token = jwt.sign(
+    {
+      _id: this.id,
+      username: this.username,
+    }, // #. 첫번째 인자로 토큰 안에 담을 데이터
+    process.env.JWT_SECRET, // #. 두번째 인자로 JWT 비밀키
+    {
+      expiresIn: "7d", // #. 7일동안 유효함
+    }
+  );
+
+  return token;
 };
 
 // #. 모델 생성
@@ -57,9 +76,15 @@ export default User;
  * 토큰 기반 인증의 장점은 서버에서 사용자 로그인 정보를 기억하기 위해 사용하는 리소스가 적고, 사용자 쪽에서 로그인 상태를 지닌 토큰을 가지고 있으므로 서버의 확장성이 높음.
  * 1. 사용자가 로그인을 하면
  * 2. 서버는 사용자에게 해당 사용자의 정보를 지니는 토큰을 발급
- * 3. 로그인 상태를 담은 토큰은 사용자 쪽에 저장.
+ * 3. 로그인 상태를 담은 토큰은 사용자 쪽에 저장. (브라우저 localStorage 또는 브라우저 sessionStorage 또는 브라우저 Cookie)
  * 4. 사용자가 요청을 보낼때 발급받은 토큰과 함께 요청하면 서버는 토큰이 유효한지 검사하고 결과에 따라 작업을 처리하고 응답.
  *
  * [ yarn add bcrypt ]
  * 단방향 해싱 함수를 지원해주는 라이브러리를 사용하여 주요 데이터를 암호화하여 저장.
+ *
+ * [ yarn add jsonwebtoken ]
+ * JWT 토큰 생성 라이브러리
+ *
+ * [$ openssl rand -hex 64 ]
+ * 64비트 랜덤 문자열 생성하여 JWT 비밀키로 사용.
  */
