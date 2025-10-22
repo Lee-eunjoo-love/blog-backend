@@ -11,6 +11,10 @@ const PostSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  user: {
+    _id: mongoose.Types.ObjectId,
+    username: String,
+  },
 });
 
 // #. 모델 생성
@@ -46,4 +50,8 @@ export default Post;
  *   },
  *   extra: Schema.Types.Mixed,
  * });
+ *
+ * [ 관계형 데이터 ]
+ * MariaDB, PostgresSQL 등 관계형 데이터베이스에서는 데이터의 id 만 관계있는 데이터에 넣어주는 반면,
+ * MongoDB 에서는 id와 필요한 데이터를 모두 관계있는 데이터({ _id, username })에 넣어 주어야 함.
  */

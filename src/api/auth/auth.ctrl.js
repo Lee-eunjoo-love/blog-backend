@@ -93,7 +93,6 @@ export const login = async (ctx) => {
 // #. 로그인 상태 확인
 export const check = async (ctx) => {
   const { user } = await ctx.state;
-  console.log(JSON.stringify(ctx), ctx.state);
   if (!user) {
     ctx.status = 401; // #. Unauthorized
     return;

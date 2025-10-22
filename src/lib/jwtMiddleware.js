@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
 const jwtMiddleware = async (ctx, next) => {
-  console.log("loading... jwt middleware!");
   const token = ctx.cookies.get(process.env.JWT_ACCESS);
 
   if (!token) return next();
@@ -29,12 +28,6 @@ const jwtMiddleware = async (ctx, next) => {
         httpOnly: true,
       });
     }
-    console.log(
-      "ctx.state.user",
-      JSON.stringify(ctx.state.user),
-      decoded._id,
-      decoded.username
-    );
 
     return next();
   } catch (e) {

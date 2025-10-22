@@ -19,11 +19,40 @@ const posts = [
     body: "내용",
   },
 ];*/
+
 const { ObjectId } = mongoose.Types;
-export const checkObjectId = (ctx, next) => {
+/**
+ * [미들웨어] 유효한 ID 이면, 해당 ID 의 정보를 현재 요청 컨텍스트의 상태 정보에 담는 기능을 담당하는 미들웨어.
+ */
+export const getPostById = async (ctx, next) => {
   const { id } = ctx.params;
   if (!ObjectId.isValid(id)) {
     ctx.status = 400; // #. Bad Request
+    return;
+  }
+
+  // #. 검증된 식별자 정보가 존재하면 현재 요청 컨텍스트의 상태 정보에 담기
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      ctx.status = 404; //#. Not Found
+      return;
+    }
+    ctx.state.post = post;
+
+    return next();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+/**
+ * [미들웨어] 로그인 사용자가 해당 포스트의 작성자인지 여부를 검증하는 기능을 담당하는 미들웨어
+ */
+export const checkOwnPost = (ctx, next) => {
+  const { user, post } = ctx.state;
+  if (post.user._id.toString() !== user._id) {
+    ctx.status = 403; // #. Forbidden 권한 없음
     return;
   }
 
@@ -56,11 +85,13 @@ export const write = async (ctx) => {
     return;
   }
 
-  const { title, body } = ctx.request.body;
+  // #. 검증된 데이터 등록
+  const { title, body, tags } = ctx.request.body;
   const post = new Post({
     title,
     body,
     tags,
+    user: ctx.state.user,
   });
 
   try {
@@ -86,14 +117,21 @@ export const list = async (ctx) => {
     return;
   }
 
+  // #. 필터링 정보 { username, tags }
+  const { tag, username } = ctx.query;
+  const query = {
+    ...(username ? { "user.username": username } : {}),
+    ...(tag ? { tags: tag } : {}),
+  };
+
   try {
-    const posts = await Post.find() //
+    const posts = await Post.find(query) //
       .sort({ _id: -1 }) // #. { key : 정렬순서(1: 순차, -1: 역순) }
       .limit(10)
       .skip((page - 1) * 10)
       .lean() // #. map((post) => post.toJSON()) 대체. 데이터를 처음부터 JSON 형태로 조회.
       .exec();
-    const postCount = await Post.countDocuments().exec();
+    const postCount = await Post.countDocuments(query).exec();
     ctx.set("Last-Page", Math.ceil(postCount / 10));
     ctx.body = posts //
       //.map((post) => post.toJSON()) // #. learn() 으로 대체.
@@ -124,7 +162,7 @@ export const list = async (ctx) => {
   }
   ctx.body = post;
 };*/
-export const read = async (ctx) => {
+/*export const read = async (ctx) => {
   const { id } = ctx.params;
   try {
     const post = await Post.findById(id).exec();
@@ -136,6 +174,9 @@ export const read = async (ctx) => {
   } catch (e) {
     ctx.throw(500, e);
   }
+};*/
+export const read = (ctx) => {
+  ctx.body = ctx.state.post;
 };
 
 /**
@@ -224,6 +265,7 @@ export const update = async (ctx) => {
     return;
   }
 
+  // #. 현재 요청 컨텍스트 정보로 업데이트
   const { id } = ctx.params;
   try {
     const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
