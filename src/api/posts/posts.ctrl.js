@@ -272,7 +272,7 @@ export const update = async (ctx) => {
       new: true,
     }).exec();
     if (!post) {
-      ctx.status = 404; // #. Bad Request
+      ctx.status = 404; // #. Not Found
       return;
     }
     ctx.body = post;

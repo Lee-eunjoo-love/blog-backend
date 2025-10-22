@@ -11,6 +11,14 @@ const MemberSchema = new Schema({
   insta: String,
   facebook: String,
   youtube: String,
+  publishedDate: {
+    type: Date,
+    default: Date.now,
+  },
+  user: {
+    _id: mongoose.Types.ObjectId,
+    username: String,
+  },
 });
 
 // #. 모델 생성
