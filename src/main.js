@@ -10,6 +10,9 @@ import Router from "koa-router"; //const Router = require("koa-router");
 import bodyParser from "koa-bodyparser"; //const bodyParser = require("koa-bodyparser"); // #. router 적용 코드 윗부분에서 로드 필요
 import mongoose from "mongoose"; //const mongoose = require("mongoose");
 import api from "./api/index.js"; //const api = require("./api");
+import serve from "koa-static";
+import path from "path";
+import send from "koa-send";
 
 // [MongoDB]
 const { PORT, MONGO_URI } = process.env;
@@ -91,6 +94,15 @@ app.use(bodyParser());
 
 // #. app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
+
+// #. koa-static 사용 정적 파일 제공 설정
+const buildDirectory = path.resolve(__dirname, "../../blog-frontend/build");
+app.use(serve(buildDirectory));
+app.use(async (ctx) => {
+  if (ctx.status === 404 && ctx.path.indexOf("/api" !== 0)) {
+    await send(ctx, "index.html", { root: buildDirectory });
+  }
+});
 
 const port = PORT || 4000;
 app.listen(port, () => {
