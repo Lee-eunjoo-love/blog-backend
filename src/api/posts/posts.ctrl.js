@@ -172,7 +172,7 @@ export const list = async (ctx) => {
       //.map((post) => post.toJSON()) // #. learn() 으로 대체.
       .map((post) => ({
         ...post,
-        body: removeHtmlAndShorten(post.body),
+        // #. body: removeHtmlAndShorten(post.body),
         // #. body: post.body.length < 200 ? post.body : `${post.body.slice(0, 200)}...`,
       }));
   } catch (e) {
